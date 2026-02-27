@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Check, Edit2 } from 'lucide-react';
 import { getStorageData, setStorageData, initPerformanceData, getCurrentYearMonth, mockEmployees, type Performance } from '../lib/mockData';
+import { canEvaluatePerformance } from '../lib/auth';
 
 export function BatchAssessPage() {
   const navigate = useNavigate();
@@ -13,6 +14,15 @@ export function BatchAssessPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editScore, setEditScore] = useState(0);
   const [editComment, setEditComment] = useState('');
+
+  if (!canEvaluatePerformance()) {
+    return (
+      <div className="p-4 text-center">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">无权限访问</h2>
+        <p className="text-gray-600">只有领导可以访问绩效评估页面</p>
+      </div>
+    );
+  }
 
   const pendingPerformances = performances.filter(
     p => p.yearMonth === currentMonth && p.status === 'pending_leader'
@@ -229,7 +239,7 @@ export function BatchAssessPage() {
       </div>
 
       {/* 底部按钮 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
         <button
           onClick={handleBatchApprove}
           disabled={selectedIds.length === 0}

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Send } from 'lucide-react';
-import { getStorageData, setStorageData, initPerformanceData, getCurrentYearMonth, mockEmployees, type Performance } from '../lib/mockData';
+import { getStorageData, initPerformanceData, getCurrentYearMonth, mockEmployees, type Performance } from '../lib/mockData';
+import { canEvaluatePerformance } from '../lib/auth';
 
 export function AssessListPage() {
   const navigate = useNavigate();
@@ -9,6 +10,15 @@ export function AssessListPage() {
   const [performances] = useState(() => 
     getStorageData<Performance[]>('performances', initPerformanceData)
   );
+
+  if (!canEvaluatePerformance()) {
+    return (
+      <div className="p-4 text-center">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">无权限访问</h2>
+        <p className="text-gray-600">只有领导可以访问绩效评估页面</p>
+      </div>
+    );
+  }
 
   const pendingPerformances = performances.filter(
     p => p.yearMonth === currentMonth && p.status === 'pending_leader'

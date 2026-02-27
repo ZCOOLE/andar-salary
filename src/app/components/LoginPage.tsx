@@ -2,18 +2,35 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { mockEmployees } from '../lib/mockData';
 import { login } from '../lib/auth';
-import { Smartphone, LogIn } from 'lucide-react';
+import { Smartphone, LogIn, Send } from 'lucide-react';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const [selectedPhone, setSelectedPhone] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = () => {
     const user = mockEmployees.find(emp => emp.phone === selectedPhone);
     if (user) {
-      login(user);
-      navigate('/');
+      // 模拟一键登录流程
+      setIsLoading(true);
+      setTimeout(() => {
+        login(user);
+        navigate('/');
+        setIsLoading(false);
+      }, 1000);
     }
+  };
+
+  const handleOneClickLogin = (emp: any) => {
+    setSelectedPhone(emp.phone);
+    // 模拟一键登录流程
+    setIsLoading(true);
+    setTimeout(() => {
+      login(emp);
+      navigate('/');
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
@@ -26,19 +43,15 @@ export function LoginPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             员工绩效薪资管理系统
           </h1>
-          <p className="text-gray-600">选择手机号一键登录（演示模式）</p>
+          <p className="text-gray-600">手机号一键登录</p>
         </div>
 
         <div className="space-y-4">
           {mockEmployees.map((emp) => (
             <button
               key={emp.id}
-              onClick={() => setSelectedPhone(emp.phone)}
-              className={`w-full p-4 rounded-lg border-2 transition-all ${
-                selectedPhone === emp.phone
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
+              onClick={() => handleOneClickLogin(emp)}
+              className="w-full p-4 rounded-lg border-2 transition-all border-gray-200 hover:border-blue-400 hover:bg-blue-50"
             >
               <div className="flex items-center justify-between">
                 <div className="text-left">
@@ -64,28 +77,26 @@ export function LoginPage() {
                       ? '领导'
                       : '财务'}
                   </span>
-                  {selectedPhone === emp.phone && (
-                    <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-white"></div>
-                    </div>
-                  )}
+                  <Send className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
             </button>
           ))}
         </div>
 
-        <button
-          onClick={handleLogin}
-          disabled={!selectedPhone}
-          className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
-        >
-          <LogIn className="w-5 h-5" />
-          一键登录
-        </button>
+        <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+          <div className="text-sm text-blue-800">
+            <strong>登录说明：</strong>
+          </div>
+          <div className="text-xs text-blue-700 mt-2 space-y-1">
+            <div>• 选择任意账号即可一键登录</div>
+            <div>• 不同账号对应不同角色权限</div>
+            <div>• 演示模式，无需真实手机号验证</div>
+          </div>
+        </div>
 
         <p className="text-center text-xs text-gray-500 mt-6">
-          💡 演示提示：选择不同账号体验不同角色功能
+          © 2026 员工绩效薪资管理系统
         </p>
       </div>
     </div>

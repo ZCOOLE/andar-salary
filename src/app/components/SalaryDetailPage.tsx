@@ -37,8 +37,8 @@ export function SalaryDetailPage() {
             <ArrowLeft className="w-6 h-6 text-gray-700" />
           </button>
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">{salary.yearMonth} 薪资</h1>
-            <p className="text-xs text-gray-500">{employee?.name}</p>
+            <h1 className="text-lg font-semibold text-gray-900">{salary.yearMonth || ''} 薪资</h1>
+            <p className="text-xs text-gray-500">{employee?.name || ''}</p>
           </div>
         </div>
       </header>
@@ -48,8 +48,8 @@ export function SalaryDetailPage() {
         {/* 总金额 */}
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white text-center">
           <div className="text-sm opacity-90 mb-2">实发工资</div>
-          <div className="text-4xl font-bold mb-1">¥{salary.totalAmount.toLocaleString()}</div>
-          <div className="text-xs opacity-75">已于 {salary.yearMonth} 月底发放</div>
+          <div className="text-4xl font-bold mb-1">¥{((salary.netSalary || 0) as number).toLocaleString()}</div>
+          <div className="text-xs opacity-75">已于 {salary.yearMonth || ''} 月底发放</div>
         </div>
 
         {/* 工资构成 */}
@@ -61,45 +61,53 @@ export function SalaryDetailPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
               <span className="text-sm text-gray-600">基本工资</span>
-              <span className="text-base font-semibold text-gray-900">¥{salary.baseSalary.toLocaleString()}</span>
+              <span className="text-base font-semibold text-gray-900">¥{((salary.baseSalary || 0) as number).toLocaleString()}</span>
             </div>
 
             <div className="py-2 border-b border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600">绩效奖金</span>
-                <span className="text-base font-semibold text-gray-900">¥{salary.actualPerformance.toLocaleString()}</span>
+                <span className="text-base font-semibold text-gray-900">¥{((salary.actualPerformance || 0) as number).toLocaleString()}</span>
               </div>
               <div className="ml-4 space-y-1 text-xs text-gray-500">
                 <div className="flex items-center justify-between">
                   <span>├─ 绩效基数</span>
-                  <span>¥{salary.performanceBonus.toLocaleString()}</span>
+                  <span>¥{((salary.performanceBase || 0) as number).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>├─ 绩效系数</span>
-                  <span>{salary.performanceRatio}%</span>
+                  <span>├─ 领导评分</span>
+                  <span>{(salary.leaderScore || 0)}%</span>
                 </div>
-                {performance && (
-                  <div className="flex items-center justify-between">
-                    <span>└─ 自评/领导评分</span>
-                    <span>{performance.selfScore}/{performance.leaderScore}</span>
-                  </div>
-                )}
+                <div className="flex items-center justify-between">
+                  <span>└─ 自评分数</span>
+                  <span>{(salary.selfScore || 0)}%</span>
+                </div>
               </div>
             </div>
 
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">补贴</span>
-              <span className="text-base font-semibold text-green-600">+¥{salary.allowance.toLocaleString()}</span>
+              <span className="text-sm text-gray-600">医社保（12.5%）</span>
+              <span className="text-base font-semibold text-red-600">-¥{((salary.insurance || 0) as number).toLocaleString()}</span>
             </div>
 
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">扣款</span>
-              <span className="text-base font-semibold text-red-600">-¥{salary.deduction.toLocaleString()}</span>
+              <span className="text-sm text-gray-600">公积金（8%）</span>
+              <span className="text-base font-semibold text-red-600">-¥{((salary.providentFund || 0) as number).toLocaleString()}</span>
+            </div>
+
+            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+              <span className="text-sm text-gray-600">计税工资</span>
+              <span className="text-base font-semibold text-gray-900">¥{((salary.taxableIncome || 0) as number).toLocaleString()}</span>
+            </div>
+
+            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+              <span className="text-sm text-gray-600">个人所得税</span>
+              <span className="text-base font-semibold text-red-600">-¥{((salary.taxAmount || 0) as number).toLocaleString()}</span>
             </div>
 
             <div className="flex items-center justify-between py-3 bg-gray-50 rounded-lg px-3 mt-3">
-              <span className="text-base font-semibold text-gray-900">合计</span>
-              <span className="text-xl font-bold text-green-600">¥{salary.totalAmount.toLocaleString()}</span>
+              <span className="text-base font-semibold text-gray-900">实发工资</span>
+              <span className="text-xl font-bold text-green-600">¥{((salary.netSalary || 0) as number).toLocaleString()}</span>
             </div>
           </div>
         </div>

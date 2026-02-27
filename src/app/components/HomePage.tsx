@@ -114,7 +114,7 @@ function EmployeeHome({ performances, currentMonth, userId }: { performances: Pe
             className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
           >
             <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <div className="text-xs text-gray-900 font-medium">上月工资</div>
+            <div className="text-xs text-gray-900 font-medium">工资历史</div>
           </button>
           <button
             onClick={() => navigate('/performance')}

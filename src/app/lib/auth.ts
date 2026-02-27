@@ -47,3 +47,27 @@ export const hasRole = (role: string | string[]): boolean => {
   }
   return user.role === role;
 };
+
+export const canViewAllEmployees = (): boolean => {
+  return hasRole(['leader', 'finance']);
+};
+
+export const canManageEmployees = (): boolean => {
+  return hasRole(['leader', 'finance']);
+};
+
+export const canViewAllSalaries = (): boolean => {
+  return hasRole(['leader', 'finance']);
+};
+
+export const canManageSalaries = (): boolean => {
+  return hasRole(['leader', 'finance']);
+};
+
+export const canEvaluatePerformance = (): boolean => {
+  return hasRole(['leader']);
+};
+
+export const canExportReports = (): boolean => {
+  return hasRole(['finance']);
+};

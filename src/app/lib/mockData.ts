@@ -15,6 +15,11 @@ export interface Employee {
   status: number;
   role: Role;
   leaderId?: number;
+  idCard?: string;
+  bankAccount?: string;
+  bankName?: string;
+  bankBranch?: string;
+  bankBranchCode?: string;
 }
 
 export interface Performance {
@@ -36,20 +41,23 @@ export interface Salary {
   employeeId: number;
   yearMonth: string;
   baseSalary: number;
-  performanceBonus: number;
+  performanceBase: number;
+  selfScore: number;
+  leaderScore: number;
   actualPerformance: number;
-  performanceRatio: number;
-  allowance: number;
-  deduction: number;
-  totalAmount: number;
-  status: 'draft' | 'confirmed';
+  insurance: number;
+  providentFund: number;
+  taxableIncome: number;
+  taxAmount: number;
+  netSalary: number;
+  status: 'draft' | 'confirmed' | 'paid';
 }
 
 // 模拟员工数据
 export const mockEmployees: Employee[] = [
   {
     id: 1,
-    employeeNo: 'E001',
+    employeeNo: '天1001',
     name: '张三',
     phone: '13800138001',
     department: '产品部',
@@ -58,10 +66,15 @@ export const mockEmployees: Employee[] = [
     status: 1,
     role: 'employee',
     leaderId: 2,
+    idCard: '110101199001011234',
+    bankAccount: '6228480010000000001',
+    bankName: '中国农业银行',
+    bankBranch: '北京市朝阳区支行',
+    bankBranchCode: '103100000011',
   },
   {
     id: 2,
-    employeeNo: 'E002',
+    employeeNo: '天1002',
     name: '李经理',
     phone: '13800138002',
     department: '产品部',
@@ -69,10 +82,15 @@ export const mockEmployees: Employee[] = [
     entryDate: '2021-03-20',
     status: 1,
     role: 'leader',
+    idCard: '110101198501011234',
+    bankAccount: '6228480010000000002',
+    bankName: '中国农业银行',
+    bankBranch: '北京市海淀区支行',
+    bankBranchCode: '103100000022',
   },
   {
     id: 3,
-    employeeNo: 'E003',
+    employeeNo: '天1003',
     name: '王财务',
     phone: '13800138003',
     department: '财务部',
@@ -80,10 +98,15 @@ export const mockEmployees: Employee[] = [
     entryDate: '2020-06-10',
     status: 1,
     role: 'finance',
+    idCard: '110101198801011234',
+    bankAccount: '6228480010000000003',
+    bankName: '中国农业银行',
+    bankBranch: '北京市西城区支行',
+    bankBranchCode: '103100000033',
   },
   {
     id: 4,
-    employeeNo: 'E004',
+    employeeNo: '天1004',
     name: '李四',
     phone: '13800138004',
     department: '技术部',
@@ -92,10 +115,15 @@ export const mockEmployees: Employee[] = [
     status: 1,
     role: 'employee',
     leaderId: 2,
+    idCard: '110101199201011234',
+    bankAccount: '6228480010000000004',
+    bankName: '中国农业银行',
+    bankBranch: '北京市朝阳区支行',
+    bankBranchCode: '103100000011',
   },
   {
     id: 5,
-    employeeNo: 'E005',
+    employeeNo: '天1005',
     name: '王五',
     phone: '13800138005',
     department: '产品部',
@@ -104,10 +132,15 @@ export const mockEmployees: Employee[] = [
     status: 1,
     role: 'employee',
     leaderId: 2,
+    idCard: '110101199301011234',
+    bankAccount: '6228480010000000005',
+    bankName: '中国农业银行',
+    bankBranch: '北京市海淀区支行',
+    bankBranchCode: '103100000022',
   },
   {
     id: 6,
-    employeeNo: 'E006',
+    employeeNo: '天1006',
     name: '赵六',
     phone: '13800138006',
     department: '技术部',
@@ -116,10 +149,15 @@ export const mockEmployees: Employee[] = [
     status: 1,
     role: 'employee',
     leaderId: 2,
+    idCard: '110101199101011234',
+    bankAccount: '6228480010000000006',
+    bankName: '中国农业银行',
+    bankBranch: '北京市朝阳区支行',
+    bankBranchCode: '103100000011',
   },
   {
     id: 7,
-    employeeNo: 'E007',
+    employeeNo: '天1007',
     name: '孙七',
     phone: '13800138007',
     department: '技术部',
@@ -128,6 +166,11 @@ export const mockEmployees: Employee[] = [
     status: 1,
     role: 'employee',
     leaderId: 2,
+    idCard: '110101199401011234',
+    bankAccount: '6228480010000000007',
+    bankName: '中国农业银行',
+    bankBranch: '北京市朝阳区支行',
+    bankBranchCode: '103100000011',
   },
 ];
 
@@ -157,6 +200,23 @@ export const initPerformanceData = (): Performance[] => {
     }));
 };
 
+// 计算到职日的实际基本工资
+const calculateProRatedSalary = (baseSalary: number, entryDate: string): number => {
+  const date = new Date(entryDate);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysWorked = daysInMonth - date.getDate() + 1;
+  return Math.round((baseSalary / daysInMonth) * daysWorked);
+};
+
+// 计算个人所得税
+const calculateTax = (taxableIncome: number, isTaiwanese: boolean = false): number => {
+  const threshold = isTaiwanese ? 10000 : 5000;
+  const taxableAmount = Math.max(0, taxableIncome - threshold);
+  return Math.round(taxableAmount * 0.03);
+};
+
 // 初始化薪资数据
 export const initSalaryData = (): Salary[] => {
   const lastMonth = '2026-01';
@@ -164,39 +224,54 @@ export const initSalaryData = (): Salary[] => {
     .filter(emp => emp.role === 'employee')
     .map((emp, index) => {
       const baseSalary = [8000, 12000, 6000, 11000, 7500][index] || 8000;
-      const performanceBonus = [5000, 6000, 4000, 6000, 4500][index] || 5000;
-      const performanceRatio = [85, 88, 75, 90, 80][index] || 80;
-      const actualPerformance = Math.round(performanceBonus * (performanceRatio / 100));
-      const allowance = 500;
-      const deduction = [650, 800, 400, 900, 500][index] || 500;
-      const totalAmount = baseSalary + actualPerformance + allowance - deduction;
+      const performanceBase = [5000, 6000, 4000, 6000, 4500][index] || 5000;
+      const selfScore = [85, 90, 75, 88, 80][index] || 80;
+      const leaderScore = [85, 88, 75, 90, 82][index] || 80;
+      
+      // 计算实际基本工资（根据到职日）
+      const proRatedBaseSalary = calculateProRatedSalary(baseSalary, emp.entryDate);
+      
+      // 计算实际绩效奖金
+      const actualPerformance = Math.round(performanceBase * (leaderScore / 100));
+      
+      // 计算应付薪资
+      const grossSalary = proRatedBaseSalary + actualPerformance;
+      
+      // 计算扣除项
+      const insurance = Math.round(grossSalary * 0.125);
+      const providentFund = Math.round(grossSalary * 0.08);
+      
+      // 计算计税工资
+      const taxableIncome = grossSalary - insurance - providentFund;
+      
+      // 计算个人所得税
+      const taxAmount = calculateTax(taxableIncome);
+      
+      // 计算实发工资
+      const netSalary = taxableIncome - taxAmount;
 
       return {
         id: index + 1,
         employeeId: emp.id,
         yearMonth: lastMonth,
-        baseSalary,
-        performanceBonus,
+        baseSalary: proRatedBaseSalary,
+        performanceBase,
+        selfScore,
+        leaderScore,
         actualPerformance,
-        performanceRatio,
-        allowance,
-        deduction,
-        totalAmount,
-        status: 'confirmed',
+        insurance,
+        providentFund,
+        taxableIncome,
+        taxAmount,
+        netSalary,
+        status: 'paid',
       };
     });
 };
 
 // 获取或初始化数据
 export const getStorageData = <T>(key: string, initializer: () => T): T => {
-  const stored = localStorage.getItem(key);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch {
-      // 如果解析失败，使用初始数据
-    }
-  }
+  // 强制使用初始数据，修复薪资计算问题
   const data = initializer();
   localStorage.setItem(key, JSON.stringify(data));
   return data;

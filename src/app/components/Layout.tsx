@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router';
-import { Home, FileText, DollarSign, User, LogOut } from 'lucide-react';
+import { Home, FileText, DollarSign, FileSpreadsheet, Users, User, LogOut } from 'lucide-react';
 import { getCurrentUser, logout } from '../lib/auth';
 
 export function Layout() {
@@ -16,6 +16,8 @@ export function Layout() {
     { path: '/', icon: Home, label: '首页' },
     { path: '/performance', icon: FileText, label: '绩效' },
     { path: '/salary', icon: DollarSign, label: '薪资' },
+    ...(currentUser?.role === 'leader' || currentUser?.role === 'finance' ? [{ path: '/employees', icon: Users, label: '员工' }] : []),
+    ...(currentUser?.role === 'finance' ? [{ path: '/export', icon: FileSpreadsheet, label: '导出' }] : []),
     { path: '/profile', icon: User, label: '我的' },
   ];
 
@@ -41,7 +43,7 @@ export function Layout() {
       </header>
 
       {/* Main Content */}
-      <main className="pb-4">
+      <main className="pb-20">
         <Outlet />
       </main>
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Send } from 'lucide-react';
-import { getCurrentUser } from '../lib/auth';
+import { getCurrentUser, canEvaluatePerformance } from '../lib/auth';
 import { getStorageData, setStorageData, initPerformanceData, mockEmployees, type Performance } from '../lib/mockData';
 
 export function AssessDetailPage() {
@@ -11,6 +11,15 @@ export function AssessDetailPage() {
   const [performance, setPerformance] = useState<Performance | null>(null);
   const [leaderScore, setLeaderScore] = useState(80);
   const [leaderComment, setLeaderComment] = useState('');
+
+  if (!canEvaluatePerformance()) {
+    return (
+      <div className="p-4 text-center">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">无权限访问</h2>
+        <p className="text-gray-600">只有领导可以访问绩效评估页面</p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     const performances = getStorageData<Performance[]>('performances', initPerformanceData);
@@ -179,7 +188,7 @@ export function AssessDetailPage() {
       </div>
 
       {/* 底部按钮 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
         <button
           onClick={handleSubmit}
           disabled={!leaderComment.trim()}

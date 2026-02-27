@@ -9,6 +9,8 @@ import { AssessListPage } from './components/AssessListPage';
 import { AssessDetailPage } from './components/AssessDetailPage';
 import { SalaryPage } from './components/SalaryPage';
 import { SalaryDetailPage } from './components/SalaryDetailPage';
+import { ExportPage } from './components/ExportPage';
+import { EmployeeManagementPage } from './components/EmployeeManagementPage';
 import { ProfilePage } from './components/ProfilePage';
 import { NotFoundPage } from './components/NotFoundPage';
 import { isAuthenticated } from './lib/auth';
@@ -70,6 +72,14 @@ export const router = createBrowserRouter([
       {
         path: 'salary/:id',
         Component: SalaryDetailPage,
+      },
+      {
+        path: 'export',
+        Component: ExportPage,
+      },
+      {
+        path: 'employees',
+        Component: EmployeeManagementPage,
       },
       {
         path: 'profile',
